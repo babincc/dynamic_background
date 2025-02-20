@@ -1,0 +1,30 @@
+name: dynamic_background
+description: Allows developers to create animated backgrounds for their Flutter
+  apps.
+version: 0.4.1
+repository: https://github.com/babincc/dynamic_background
+issue_tracker: https://github.com/babincc/dynamic_background/issues
+
+topics:
+  - animated-background
+  - live-background
+
+funding:
+  - https://www.buymeacoffee.com/babincc
+  - https://paypal.me/cssbabin
+  - https://venmo.com/u/babincc
+
+environment:
+  sdk: ^3.6.1
+  flutter: ">=1.17.0"
+
+dependencies:
+  collection: ^1.18.0
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_lints: ^5.0.0
+  flutter_test:
+    sdk: flutter
+  lints: ^5.1.1
