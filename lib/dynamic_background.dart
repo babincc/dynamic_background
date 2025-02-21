@@ -1,5 +1,5 @@
 // @author Christian Babin
-// @version 0.4.1
+// @version 0.5.0
 // https://github.com/babincc/dynamic_background/blob/master/lib/dynamic_background.dart
 
 export 'package:dynamic_background/domain/enums/fader_behavior.dart';

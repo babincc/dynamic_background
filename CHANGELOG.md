@@ -1,6 +1,6 @@
-## 0.4.1 - February 20, 2025
+## 0.5.0 - February 20, 2025
 
-- Added lava animation
+- Added lava animations
 - Moved repo
 - Updated dependencies
 
