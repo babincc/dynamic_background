@@ -21,24 +21,29 @@ class LavaPainterData extends PainterData {
   /// randomness in their movement speed. The duration will only affect the rate
   /// at which the blobs change color.
   LavaPainterData({
-    this.width = 150.0,
+    this.width = 200.0,
     this.widthTolerance = 0.0,
-    this.growAndShrink = true,
-    this.blurLevel = 20.0,
+    this.growAndShrink = false,
+    this.growthRate = 20.0,
+    this.growthRateTolerance = 0.0,
+    this.blurLevel = 25.0,
     this.numBlobs = 5,
+    this.backgroundColor = Colors.transparent,
     required List<Color> colors,
     this.allSameColor = false,
-    this.fadeBetweenColors = false,
+    this.fadeBetweenColors = true,
     this.changeColorsTogether = false,
-    this.speed = 5,
-    this.speedTolerance = 0,
+    this.speed = 20.0,
+    this.speedTolerance = 0.0,
   })  : assert(width > 0.0),
         assert(width - widthTolerance > 0.0),
+        assert(growthRate >= 0.0),
+        assert(growthRate - growthRateTolerance >= 0.0),
         assert(blurLevel >= 0.0),
         assert(numBlobs > 0),
         assert(colors.isNotEmpty, true),
-        assert(speed > 0),
-        assert(speed - speedTolerance > 0),
+        assert(speed >= 0),
+        assert(speed - speedTolerance >= 0),
         _colors = colors,
         _blobs = [] {
     for (int i = 0; i < numBlobs; i++) {
@@ -47,6 +52,8 @@ class LavaPainterData extends PainterData {
           width: width,
           widthTolerance: widthTolerance,
           growAndShrink: growAndShrink,
+          growthRate: growthRate,
+          growthRateTolerance: growthRateTolerance,
           blurLevel: blurLevel,
           colors: colors,
           allSameColor: allSameColor,
@@ -78,6 +85,21 @@ class LavaPainterData extends PainterData {
   /// the circles will remain a static size.
   final bool growAndShrink;
 
+  /// The rate at which the circle will grow and shrink.
+  double growthRate;
+
+  /// The amount more or less than the set [growthRate] that the circles can
+  /// grow and shrink.
+  ///
+  /// This is used to give the circles a bit of randomness in their growth rate.
+  ///
+  /// For example, if [growthRate] is `20.0` and [growthRateTolerance] is `5.0`,
+  /// the circles can grow and shrink at a rate of anywhere from `15.0` to
+  /// `25.0`.
+  ///
+  /// The default value is `0.0`.
+  final double growthRateTolerance;
+
   /// How extreme the blur effect should be. The higher the number, the more
   /// extreme the blur effect.
   final double blurLevel;
@@ -86,6 +108,9 @@ class LavaPainterData extends PainterData {
   ///
   /// The default value is `5`.
   final int numBlobs;
+
+  /// The color of the background behind the circles.
+  final Color backgroundColor;
 
   /// The colors of the circles that will be moving on the screen.
   ///
@@ -299,8 +324,11 @@ class LavaPainterData extends PainterData {
     double? width,
     double? widthTolerance,
     bool? growAndShrink,
+    double? growthRate,
+    double? growthRateTolerance,
     double? blurLevel,
     int? numBlobs,
+    Color? backgroundColor,
     List<Color>? colors,
     bool? allSameColor,
     bool? fadeBetweenColors,
@@ -312,8 +340,11 @@ class LavaPainterData extends PainterData {
       width: width ?? this.width,
       widthTolerance: widthTolerance ?? this.widthTolerance,
       growAndShrink: growAndShrink ?? this.growAndShrink,
+      growthRate: growthRate ?? this.growthRate,
+      growthRateTolerance: growthRateTolerance ?? this.growthRateTolerance,
       blurLevel: blurLevel ?? this.blurLevel,
       numBlobs: numBlobs ?? this.numBlobs,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
       colors: colors ?? List<Color>.from(_colors),
       allSameColor: allSameColor ?? this.allSameColor,
       fadeBetweenColors: fadeBetweenColors ?? this.fadeBetweenColors,
@@ -336,8 +367,11 @@ class LavaPainterData extends PainterData {
         identical(other.width, width) &&
         identical(other.widthTolerance, widthTolerance) &&
         identical(other.growAndShrink, growAndShrink) &&
+        identical(other.growthRate, growthRate) &&
+        identical(other.growthRateTolerance, growthRateTolerance) &&
         identical(other.blurLevel, blurLevel) &&
         identical(other.numBlobs, numBlobs) &&
+        other.backgroundColor == backgroundColor &&
         const DeepCollectionEquality().equals(other._colors, _colors) &&
         identical(other.allSameColor, allSameColor) &&
         identical(other.fadeBetweenColors, fadeBetweenColors) &&
@@ -355,8 +389,11 @@ class LavaPainterData extends PainterData {
         width,
         widthTolerance,
         growAndShrink,
+        growthRate,
+        growthRateTolerance,
         blurLevel,
         numBlobs,
+        backgroundColor,
         const DeepCollectionEquality().hash(_colors),
         allSameColor,
         fadeBetweenColors,
@@ -371,8 +408,11 @@ class LavaPainterData extends PainterData {
       'width: $width, '
       'widthTolerance: $widthTolerance, '
       'growAndShrink: $growAndShrink, '
+      'growthRate: $growthRate, '
+      'growthRateTolerance: $growthRateTolerance, '
       'blurLevel: $blurLevel, '
       'numBlobs: $numBlobs, '
+      'backgroundColor: $backgroundColor, '
       'colors: $_colors'
       'allSameColor: $allSameColor, '
       'fadeBetweenColors: $fadeBetweenColors, '

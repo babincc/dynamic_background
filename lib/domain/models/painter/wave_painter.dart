@@ -28,6 +28,9 @@ class WavePainter extends Painter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    // Draw the background color.
+    canvas.drawPaint(Paint()..color = data.backgroundColor);
+
     for (final Wave wave in data.waves) {
       _validateOffset(wave, size);
 

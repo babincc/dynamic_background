@@ -15,8 +15,12 @@ class WavePainterData extends PainterData {
   /// A wave background is a background that has gently flowing sine waves that
   /// move across the screen in a certain direction.
   const WavePainterData({
+    this.backgroundColor = Colors.transparent,
     required List<Wave> waves,
   }) : _waves = waves;
+
+  /// The color of the background behind the waves.
+  final Color backgroundColor;
 
   /// The waves that will be moving across the screen.
   final List<Wave> _waves;
@@ -181,9 +185,11 @@ class WavePainterData extends PainterData {
 
   @override
   WavePainterData copyWith({
+    Color? backgroundColor,
     List<Wave>? waves,
   }) {
     return WavePainterData(
+      backgroundColor: backgroundColor ?? this.backgroundColor,
       waves: waves ?? _waves.map((wave) => wave.copy()).toList(),
     );
   }
@@ -198,6 +204,7 @@ class WavePainterData extends PainterData {
     if (other.runtimeType != runtimeType) return false;
 
     return other is WavePainterData &&
+        other.backgroundColor == backgroundColor &&
         const DeepCollectionEquality().equals(other._waves, _waves);
   }
 
@@ -205,10 +212,14 @@ class WavePainterData extends PainterData {
   /// two objects have the same waves but in a different order, they will not
   /// have the same hash code.
   @override
-  int get hashCode => const DeepCollectionEquality().hash(_waves);
+  int get hashCode => Object.hash(
+        backgroundColor,
+        const DeepCollectionEquality().hash(_waves),
+      );
 
   @override
   String toString() => 'Instance of WavePainterData: {'
+      'backgroundColor: $backgroundColor, '
       'waves: $_waves'
       '}';
 }

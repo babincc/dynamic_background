@@ -6,6 +6,7 @@ import 'package:dynamic_background/domain/enums/wave_direction.dart';
 import 'package:dynamic_background/domain/enums/wave_gravity_direction.dart';
 import 'package:dynamic_background/domain/models/color_schemes.dart';
 import 'package:dynamic_background/domain/models/painter_data/fader_painter_data.dart';
+import 'package:dynamic_background/domain/models/painter_data/lava_painter_data.dart';
 import 'package:dynamic_background/domain/models/painter_data/scroller_painter_data.dart';
 import 'package:dynamic_background/domain/models/painter_data/wave_painter_data.dart';
 import 'package:dynamic_background/domain/models/wave.dart';
@@ -38,6 +39,7 @@ class PrebuiltPainters {
   ///
   /// Recommended for light mode.
   static WavePainterData get atomicRings => WavePainterData(
+        backgroundColor: ColorSchemes.vibrantBlackBg,
         waves: [
           Wave(
             direction: WaveDirection.right2Left,
@@ -194,6 +196,32 @@ class PrebuiltPainters {
         shapeOffset: ScrollerShapeOffset.shiftAndMesh,
       );
 
+  /// Cyan, magenta, and yellow circles moving around like spotlights.
+  ///
+  /// Recommended duration: 35 seconds
+  ///
+  /// Recommended for light mode.
+  static LavaPainterData get cmyCircles => LavaPainterData(
+        width: 175.0,
+        widthTolerance: 0.0,
+        growAndShrink: false,
+        growthRate: 0.0,
+        growthRateTolerance: 0.0,
+        blurLevel: 0.0,
+        numBlobs: 12,
+        backgroundColor: ColorSchemes.gentleWhiteBg,
+        colors: [
+          Color.fromARGB(128, 0, 255, 255),
+          Color.fromARGB(128, 255, 0, 255),
+          Color.fromARGB(128, 255, 255, 0),
+        ],
+        allSameColor: false,
+        fadeBetweenColors: false,
+        changeColorsTogether: false,
+        speed: 20.0,
+        speedTolerance: 5.0,
+      );
+
   /// Icy blue diamonds raining down from the top of the screen on a pale blue
   /// background.
   ///
@@ -209,6 +237,30 @@ class PrebuiltPainters {
         spaceBetweenShapes: 24.0,
         fadeEdges: true,
         shapeOffset: ScrollerShapeOffset.shift,
+      );
+
+  /// Red circles growing and shrinking on a dark background.
+  ///
+  /// Recommended duration: 35 seconds
+  ///
+  /// Recommended for dark mode.
+  static LavaPainterData get dilatingCircles => LavaPainterData(
+        width: 100.0,
+        widthTolerance: 80.0,
+        growAndShrink: true,
+        growthRate: 25.0,
+        growthRateTolerance: 10.0,
+        blurLevel: 0.0,
+        numBlobs: 15,
+        backgroundColor: ColorSchemes.gentleBlackBg,
+        colors: [
+          ColorSchemes.gentleRedBg,
+        ],
+        allSameColor: true,
+        fadeBetweenColors: false,
+        changeColorsTogether: true,
+        speed: 0.0,
+        speedTolerance: 0.0,
       );
 
   /// Dark colors subtly fading in and out.
@@ -264,6 +316,33 @@ class PrebuiltPainters {
         fadeEdges: true,
       );
 
+  /// Blurry orange and yellow blobs floating around like a lava lamp.
+  ///
+  /// Recommended duration: 35 seconds
+  ///
+  /// Recommended for light mode.
+  static LavaPainterData get lavaLamp => LavaPainterData(
+        width: 250.0,
+        widthTolerance: 75.0,
+        growAndShrink: true,
+        growthRate: 10.0,
+        growthRateTolerance: 5.0,
+        blurLevel: 25.0,
+        numBlobs: 5,
+        backgroundColor: ColorSchemes.gentleWhiteBg,
+        colors: [
+          ColorSchemes.vibrantOrangeBg,
+          ColorSchemes.vibrantOrangeFg,
+          ColorSchemes.vibrantYellowBg,
+          ColorSchemes.vibrantYellowFg,
+        ],
+        allSameColor: false,
+        fadeBetweenColors: true,
+        changeColorsTogether: false,
+        speed: 20.0,
+        speedTolerance: 5.0,
+      );
+
   /// Yellow circles scrolling from left to right on a pale yellow background,
   /// like lemons in the sunshine.
   ///
@@ -287,6 +366,7 @@ class PrebuiltPainters {
   ///
   /// Recommended for dark mode.
   static WavePainterData milkWaves = WavePainterData(
+    backgroundColor: ColorSchemes.vibrantBlackBg,
     waves: [
       Wave(
         direction: WaveDirection.right2Left,

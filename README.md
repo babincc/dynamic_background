@@ -86,7 +86,41 @@ DynamicBg(
 ),
 ```
 
-### Example 4 - Prebuilt backgrounds
+### Example 4 - Simple Lava Lamp
+
+This example shows how to set up an animated background with moving circles to have a lava lamp effect.
+
+Note: The colors being used are provided with this package.
+
+```dart
+DynamicBg(
+  duration: const Duration(seconds: 35),
+  painterData: LavaPainterData(
+    width: 250.0,
+    widthTolerance: 75.0,
+    growAndShrink: true,
+    growthRate: 10.0,
+    growthRateTolerance: 5.0,
+    blurLevel: 25.0,
+    numBlobs: 5,
+    backgroundColor: ColorSchemes.gentleWhiteBg,
+    colors: [
+      ColorSchemes.vibrantOrangeBg,
+      ColorSchemes.vibrantOrangeFg,
+      ColorSchemes.vibrantYellowBg,
+      ColorSchemes.vibrantYellowFg,
+    ],
+    allSameColor: false,
+    fadeBetweenColors: true,
+    changeColorsTogether: false,
+    speed: 20.0,
+    speedTolerance: 5.0,
+  ),
+  child: yourPageHere(),
+),
+```
+
+### Example 5 - Prebuilt backgrounds
 
 This example shows how to use prebuilt backgrounds.
 
@@ -100,7 +134,7 @@ DynamicBg(
 ),
 ```
 
-### Example 5 - Modify prebuilt backgrounds
+### Example 6 - Modify prebuilt backgrounds
 
 This example shows how to modify prebuilt backgrounds to best fit your needs.
 
@@ -116,7 +150,7 @@ DynamicBg(
 ),
 ```
 
-### Example 6 - Stack backgrounds
+### Example 7 - Stack backgrounds
 
 This example shows how to stack backgrounds for interesting new effects.
 
@@ -142,7 +176,7 @@ DynamicBg(
 ),
 ```
 
-### Example 7 - Backgrounds for smaller widgets
+### Example 8 - Backgrounds for smaller widgets
 
 This example shows that you can apply dynamic backgrounds to widgets rather than the entire screen. Here is a button with an animated background.
 

@@ -1,6 +1,7 @@
 import 'package:dynamic_background/domain/models/lava.dart';
 import 'package:dynamic_background/domain/models/painter/painter.dart';
 import 'package:dynamic_background/domain/models/painter_data/lava_painter_data.dart';
+import 'package:dynamic_background/utils/math_tools.dart';
 import 'package:flutter/material.dart';
 
 /// This is the painter for animating blobs moving around the screen like a lava
@@ -20,7 +21,16 @@ class LavaPainter extends Painter {
 
   @override
   void paint(Canvas canvas, Size size) {
+    // Draw the background color.
+    canvas.drawPaint(Paint()..color = data.backgroundColor);
+
     for (final Lava lava in data.blobs) {
+      if (lava.position == Lava.initPosition) {
+        lava.position = Offset(
+          randDouble(0.0, size.width),
+          randDouble(0.0, size.height),
+        );
+      }
       _paintBlob(canvas, size, lava);
     }
   }

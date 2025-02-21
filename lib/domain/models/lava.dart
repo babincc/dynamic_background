@@ -12,6 +12,8 @@ class Lava {
     required this.width,
     required this.widthTolerance,
     required this.growAndShrink,
+    required this.growthRate,
+    required this.growthRateTolerance,
     required this.blurLevel,
     required this.colors,
     required this.allSameColor,
@@ -21,26 +23,37 @@ class Lava {
     required this.speedTolerance,
   })  : assert(width > 0.0),
         assert(width - widthTolerance > 0.0),
+        assert(growthRate >= 0.0),
+        assert(growthRate - growthRateTolerance >= 0.0),
         assert(blurLevel >= 0.0),
         assert(colors.isNotEmpty, true),
-        assert(speed > 0),
-        assert(speed - speedTolerance > 0),
+        assert(speed >= 0),
+        assert(speed - speedTolerance >= 0),
+        _originalWidth = width,
         color =
             allSameColor ? colors[0] : colors[randInt(0, colors.length - 1)],
         _colorIndex = 0,
         _isGrowing = randInt(0, 9) % 2 == 0,
-        position = Offset(randDouble(0.0, 1.0), randDouble(0.0, 1.0)),
+        position = initPosition,
         direction = LavaDirection.values[randInt(
           0,
           LavaDirection.values.length - 1,
         )],
-        _lastStep = 10.0,
-        _fadePhase = changeColorsTogether ? 0.0 : randDouble(0.0, 1.0) {
+        _previousAnimationValue = 10.0,
+        _previousStep = 10,
+        _fadePhase = allSameColor
+            ? 0.0
+            : changeColorsTogether
+                ? 0.0
+                : randDouble(0.0, 1.0) {
     // Randomly set the size of the circle.
     width += randDouble(-widthTolerance, widthTolerance);
 
     // Randomly set the speed of the circle.
     speed += randDouble(-speedTolerance, speedTolerance);
+
+    // Randomly set the growth rate of the circle.
+    growthRate += randDouble(-growthRateTolerance, growthRateTolerance);
 
     // Set the next color.
     if (colors.length == 1) {
@@ -54,8 +67,17 @@ class Lava {
     }
   }
 
+  /// The initial position of the circle when a new circle is created.
+  ///
+  /// This is used to determine if the circle has been given a proper starting
+  /// position based on available screen space.
+  static const Offset initPosition = Offset(-99999.99999, -99999.99999);
+
   /// The width of this circle.
   double width;
+
+  /// The original width of this circle.
+  final double _originalWidth;
 
   /// The amount more or less than the set [width] that the circles can be.
   ///
@@ -78,6 +100,21 @@ class Lava {
   /// If this is `true`, the circle is growing. If this is `false`, the circle
   /// is shrinking.
   bool _isGrowing;
+
+  /// The rate at which the circle will grow and shrink.
+  double growthRate;
+
+  /// The amount more or less than the set [growthRate] that the circles can
+  /// grow and shrink.
+  ///
+  /// This is used to give the circles a bit of randomness in their growth rate.
+  ///
+  /// For example, if [growthRate] is `20.0` and [growthRateTolerance] is `5.0`,
+  /// the circles can grow and shrink at a rate of anywhere from `15.0` to
+  /// `25.0`.
+  ///
+  /// The default value is `0.0`.
+  final double growthRateTolerance;
 
   /// How extreme the blur effect should be. The higher the number, the more
   /// extreme the blur effect.
@@ -146,8 +183,11 @@ class Lava {
   /// The direction this circle is moving.
   LavaDirection direction;
 
-  /// The animation value of the last step.
-  double _lastStep;
+  /// The previous value of the animation.
+  double _previousAnimationValue;
+
+  /// The previous step for color fading.
+  int _previousStep;
 
   /// Returns the data for the next step of this circle in the lava lamp
   /// pattern.
@@ -160,29 +200,37 @@ class Lava {
     final double rawPhase = animationValue + _fadePhase;
     animationValue = rawPhase == 1.0 ? 1.0 : rawPhase % 1.0;
 
-    if (animationValue < _lastStep) {
-      _lastStep = 0.0;
+    if (animationValue < _previousAnimationValue) {
+      _previousAnimationValue = 0.0;
+      _previousStep = -1;
     }
 
     // Calculate the next width of the circle.
     if (growAndShrink) {
-      // TODO This could overshoot the tolerance. Also, toggle _isGrowing when it reaches the tolerance.
+      const double growthRateMultiplier = 0.01;
       if (_isGrowing) {
-        width += randDouble(0.0, widthTolerance);
+        width += growthRate * growthRateMultiplier;
+        if (width >= _originalWidth + widthTolerance) {
+          _isGrowing = false;
+          width = _originalWidth + widthTolerance;
+        }
       } else {
-        width -= randDouble(0.0, widthTolerance);
+        width -= growthRate * growthRateMultiplier;
+        if (width <= _originalWidth - widthTolerance) {
+          _isGrowing = true;
+          width = _originalWidth - widthTolerance;
+        }
       }
     }
 
     // Calculate the next color of the circle.
     if (fadeBetweenColors) {
       final double stepLength = 1.0 / colors.length;
-      double step = stepLength;
-      while (step < animationValue) {
-        step += stepLength;
-      }
-      step -= stepLength;
-      if (_lastStep < step) {
+      final int step =
+          min((animationValue / stepLength).floor(), colors.length - 1);
+
+      if (_previousStep < step || _previousStep < 0) {
+        _previousStep = step;
         _colorIndex = __nextColorIndex;
         _setNextColor();
       }
@@ -190,18 +238,19 @@ class Lava {
       color = Color.lerp(
             colors[_colorIndex],
             colors[__nextColorIndex],
-            (animationValue % stepLength) / stepLength,
+            (animationValue - (step * stepLength)) / stepLength,
           ) ??
           colors[_colorIndex];
     }
 
     // Calculate the next position of the circle.
+    const double speedMultiplier = 0.075;
     final double radians = direction.degrees * (pi / 180);
-    final double x = position.dx + ((speed * 0.5) * cos(radians));
-    final double y = position.dy + ((speed * 0.5) * sin(radians));
+    final double x = position.dx + ((speed * speedMultiplier) * cos(radians));
+    final double y = position.dy + ((speed * speedMultiplier) * sin(radians));
     position = Offset(x, y);
 
-    _lastStep = animationValue;
+    _previousAnimationValue = animationValue;
   }
 
   void _setNextColor() {
@@ -209,7 +258,7 @@ class Lava {
       __nextColorIndex = 0;
     } else {
       if (allSameColor) {
-        __nextColorIndex = (_colorIndex + 1) % colors.length;
+        __nextColorIndex = (__nextColorIndex + 1) % colors.length;
       } else {
         __nextColorIndex = randIntExcluding(
           0,
@@ -231,6 +280,8 @@ class Lava {
     double? width,
     double? widthTolerance,
     bool? growAndShrink,
+    double? growthRate,
+    double? growthRateTolerance,
     double? blurLevel,
     List<Color>? colors,
     bool? allSameColor,
@@ -243,6 +294,8 @@ class Lava {
       width: width ?? this.width,
       widthTolerance: widthTolerance ?? this.widthTolerance,
       growAndShrink: growAndShrink ?? this.growAndShrink,
+      growthRate: growthRate ?? this.growthRate,
+      growthRateTolerance: growthRateTolerance ?? this.growthRateTolerance,
       blurLevel: blurLevel ?? this.blurLevel,
       colors: colors ?? this.colors,
       allSameColor: allSameColor ?? this.allSameColor,
@@ -264,6 +317,8 @@ class Lava {
         identical(other.widthTolerance, widthTolerance) &&
         identical(other.growAndShrink, growAndShrink) &&
         identical(other._isGrowing, _isGrowing) &&
+        identical(other.growthRate, growthRate) &&
+        identical(other.growthRateTolerance, growthRateTolerance) &&
         identical(other.blurLevel, blurLevel) &&
         const DeepCollectionEquality().equals(other.colors, colors) &&
         identical(other._colorIndex, _colorIndex) &&
@@ -283,6 +338,8 @@ class Lava {
         widthTolerance,
         growAndShrink,
         _isGrowing,
+        growthRate,
+        growthRateTolerance,
         blurLevel,
         const DeepCollectionEquality().hash(colors),
         _colorIndex,
@@ -302,6 +359,8 @@ class Lava {
       'widthTolerance: $widthTolerance, '
       'growAndShrink: $growAndShrink, '
       '_isGrowing: $_isGrowing, '
+      'growthRate: $growthRate, '
+      'growthRateTolerance: $growthRateTolerance, '
       'blurLevel: $blurLevel, '
       'colors: $colors'
       '_colorIndex: $_colorIndex, '
